@@ -1,70 +1,26 @@
 'use client'
 
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
-export default function Home() {
-  const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function HomePage() {
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/chat'
-      }
-    })
-
-    if (error) {
-      setMessage('❌ 錯誤：' + error.message)
-    } else {
-      setMessage('✅ 登入 Email 已寄送！請檢查收件匣（垃圾郵件也要看）')
+      // 不管有沒有 user，都直接帶去 /chat
+      // 如果沒有登入，/chat 左下角會顯示「前往登入頁面」
+      window.location.href = '/chat'
     }
-    
-    setLoading(false)
-  }
+
+    checkAndRedirect()
+  }, [])
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-8">
-      <div className="max-w-md w-full bg-white/20 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/30">
-        <h1 className="text-4xl font-bold text-white text-center mb-8 drop-shadow-lg">
-          💬 即時聊天室
-        </h1>
-        
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="輸入你的 Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-4 rounded-xl bg-white/80 backdrop-blur-sm border border-white/50 focus:outline-none focus:ring-2 focus:ring-white/80 text-lg placeholder-gray-500"
-            required
-            disabled={loading}
-          />
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full p-4 bg-white text-blue-600 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '⏳ 寄送中...' : '🚀 立即登入'}
-          </button>
-        </form>
-        
-        {message && (
-          <div className="mt-6 p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
-            <p className="text-white text-center font-medium">{message}</p>
-          </div>
-        )}
-        
-        <p className="text-white/80 text-center mt-6 text-sm">
-          會寄送魔法連結到你的 Email，點擊即可進入聊天室！
-        </p>
-      </div>
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <p className="text-gray-500">正在前往聊天室...</p>
     </main>
   )
 }
