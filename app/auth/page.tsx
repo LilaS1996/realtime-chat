@@ -17,7 +17,7 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          emailRedirectTo: 'http://localhost:3000/chat',
+          emailRedirectTo: 'https://realtime-chat-one-amber.vercel.app/',
         },
       })
 
